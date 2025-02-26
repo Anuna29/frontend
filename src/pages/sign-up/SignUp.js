@@ -4,12 +4,12 @@ import React, { useState } from "react";
 import * as yup from "yup";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, TextField } from "../../components";
-// import { useUserContext } from "../../context";
+import { useUserContext } from "../../context";
 import { useFormik } from "formik";
 
 export const SignUpPage = () => {
   const navigate = useNavigate();
-  // const { setCurrentUser } = useUserContext();
+  const { setCurrentUser } = useUserContext(); 
   const [error, setError] = useState(null);
 
   const validationSchema = yup.object({
@@ -36,7 +36,7 @@ export const SignUpPage = () => {
       const { data } = response;
       localStorage.setItem("user", JSON.stringify(data));
 
-      // setCurrentUser(data);
+      setCurrentUser(data);
     } catch (error) {
       setError(error.message);
     }

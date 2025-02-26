@@ -1,10 +1,27 @@
 import React from 'react'
 import { useUserContext } from "../../context"
+import { Button } from '../../components';
 
 export const HomePage = () => {
-  const { loading, currentUser } = useUserContext; 
-  console.log(loading, currentUser)
+  const { loading, currentUser, setCurrentUser } = useUserContext(); 
+
+  const signOut = () => {
+    setCurrentUser(null);
+    localStorage.removeItem("user");
+  };
+
+  if (loading) return <div>Loading...</div>;
+
   return (
-    <div>HomePage</div>
-  )
-}
+    <div>
+      {currentUser ? (
+        <div style={{display: "flex", flexDirection: "column", gap:10}}>
+          {currentUser.user.email}
+          <Button onClick={signOut}>Sign Out</Button>
+        </div>
+      ) : (
+        "Guest"
+      )}
+    </div>
+  );
+};

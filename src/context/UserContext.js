@@ -1,4 +1,15 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+
+const isTokenExpired = (token) => {
+  const payload = JSON.parse(atob(token.split(".")[1]));
+
+  if (!payload) {
+    return true;
+  } else {
+    const currentTime = Date.now() / 1000;
+    return payload.exp < currentTime;
+  }
+};
 
 const UserContext = createContext();
 
@@ -9,40 +20,34 @@ export const UserContextProvider = (props) => {
 
   useEffect(() => {
     try {
-      const user = JSON.parse(localStorage.getItem('user'));
+      const user = JSON.parse(localStorage.getItem("user"));
 
-      if(!user){
-        return setLoading(false);
+      if (!user) {
+        setLoading(false);
+        return;
       }
 
       const { token } = user;
 
-      const isTokenExpired = (token) => {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-
-        if(!payload){
-          return true;
-        }else{
-          const currentTime = Date.now()/1000;
-          return payload.exp < currentTime;
-        }
-      };
-
-      if ( token && !isTokenExpired(token)){
+      if (token && !isTokenExpired(token)) {
         setCurrentUser(user);
         setLoading(false);
-      }else{
-        alert("Session is expired. Log back in to receive data");
+      } else {
+        alert("Session is expired. Log back in to retrieve data");
         setCurrentUser(null);
-        localStorage.removeItem('user');
+        localStorage.removeItem("user");
         setLoading(false);
       }
-    }catch(error){
-      console.log("Error fetching user data");
+    } catch (error) {
+      console.log(error.message);
     }
-  },[]);
+  }, []);
 
-  return <UserContextProvider value = {{currentUser, setCurrentUser, loading}}>{children}</UserContextProvider>
+  return (
+    <UserContext.Provider value={{ currentUser, setCurrentUser, loading }}>
+      {children}
+    </UserContext.Provider>
+  );
 };
 
 export const useUserContext = () => {

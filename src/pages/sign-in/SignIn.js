@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
-import "./SignIn.css"
+import React, { useState } from "react";
+import "./SignIn.css";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, TextField } from "../../components";
 import axios from "axios";
+import { useUserContext } from "../../context";
 
 export const SignInPage = () => {
   const [error, setError] = useState(null);
@@ -11,6 +12,7 @@ export const SignInPage = () => {
     email: "",
     password: "",
   });
+  const { setCurrentUser } = useUserContext();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,31 +23,25 @@ export const SignInPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (
-      formData.email &&
-      formData.password) {
-     
+    if (formData.email && formData.password) {
       try {
-
-        const response = await axios.post("http://localhost:9000/auth/signin", 
-          {
-            email: formData.email, 
-            password: formData.password,
-          });
+        const response = await axios.post("http://localhost:9000/auth/signin", {
+          email: formData.email,
+          password: formData.password,
+        });
 
         const { data } = response;
-
         localStorage.setItem("user", JSON.stringify(data));
 
-        console.log("User context should be placed here");
+        setCurrentUser(data);
 
         setFormData({
           email: "",
           password: "",
         });
         navigate("/");
-      } catch (error){
-        setError(error.message)
+      } catch (error) {
+        setError(error.message);
       }
     } else {
       alert("Please enter all fields");
